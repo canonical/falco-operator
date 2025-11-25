@@ -12,5 +12,5 @@ Description here.
 Example <integration-name> integrate command: 
 
 ```
-juju integrate __charm_name__ <supported-charm>:<integration-name>
+juju integrate falco <supported-charm>:<integration-name>
 ```
