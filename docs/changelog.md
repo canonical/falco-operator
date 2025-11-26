@@ -8,6 +8,8 @@ Each revision is versioned by the date of the revision.
 
 ## 2025-11-25
 
+Set up initial Falco operator project.
+
 ### Changed
 - Updated __charm_name__ from template placeholder to `falco`
 - Updated `charmcraft.yaml` with Falco-specific configuration
