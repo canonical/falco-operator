@@ -1,0 +1,164 @@
+name: Build Falco Binary
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".versions"
+      - ".github/workflows/build_falco.yaml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".versions"
+      - ".github/workflows/build_falco.yaml"
+  workflow_dispatch:
+
+jobs:
+  build-falco:
+    name: Build Falco from Source
+    runs-on: ubuntu-24.04
+    outputs:
+      falco-version: "${{ steps.version.outputs.falco_version }}"
+      k8saudit-plugin-version: "${{ steps.version.outputs.k8saudit_plugin_version }}"
+    env:
+      SOURCE_ROOT: /tmp/source
+      ARTIFACT_ROOT: /tmp/artifacts
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Extract Falco and Falco plugin version
+        id: version
+        run: |
+          # Read versions from .versions file
+          source .versions
+          echo "falco_version=${FALCO_VERSION}" >> $GITHUB_OUTPUT
+          echo "k8saudit_plugin_version=${FALCO_K8SAUDIT_PLUGIN_VERSION}" >> $GITHUB_OUTPUT
+          echo "Building Falco version: ${FALCO_VERSION}"
+          echo "Building Falco k8saudit plugin version: ${FALCO_K8SAUDIT_PLUGIN_VERSION}"
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            git \
+            cmake \
+            clang \
+            build-essential \
+            linux-tools-common \
+            linux-tools-generic \
+            libelf-dev
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.25"
+
+      - name: Clone Falco and plugins source
+        run: |
+          git clone --depth 1 --recurse-submodule --branch "${{ steps.version.outputs.falco_version }}" https://github.com/falcosecurity/falco.git $SOURCE_ROOT/falco
+          echo "Falco source cloned at tag: ${{ steps.version.outputs.falco_version }}"
+
+          git clone --depth 1 --branch "plugins/k8saudit/v${{ steps.version.outputs.k8saudit_plugin_version }}" https://github.com/falcosecurity/plugins.git $SOURCE_ROOT/plugins
+          echo "Plugins source cloned at tag: plugins/k8saudit/v${{ steps.version.outputs.k8saudit_plugin_version }}"
+
+      - name: Build Falco binary
+        run: |
+          cd $SOURCE_ROOT/falco
+
+          mkdir -p $SOURCE_ROOT/falco/build && cd $SOURCE_ROOT/falco/build
+          cmake \
+            -DCMAKE_C_COMPILER="$(which gcc)" \
+            -DCMAKE_CXX_COMPILER="$(which g++)" \
+            -DCMAKE_VERBOSE_MAKEFILE=On \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DUSE_BUNDLED_DEPS=On \
+            ..
+          make -j$(nproc) falco
+
+          # Display build output
+          ls -lrh ./userspace/falco
+          ls -lrh ./container_plugin-prefix/
+
+          # Verify the binary was built
+          ./userspace/falco/falco --version
+
+      - name: Build Falco plugin
+        run: |
+          cd $SOURCE_ROOT/plugins/plugins/k8saudit && make
+
+          # Display and verify build output
+          ls -lrh ./libk8saudit.so
+
+      - name: Prepare artifacts
+        run: |
+          mkdir -p \
+            $ARTIFACT_ROOT/etc/falco/rules.d \
+            $ARTIFACT_ROOT/etc/falco/default_rules \
+            $ARTIFACT_ROOT/usr/bin \
+            $ARTIFACT_ROOT/usr/share/falco/plugins
+
+          cp $SOURCE_ROOT/falco/rules/falco_rules.yaml $ARTIFACT_ROOT/etc/falco/default_rules/
+          cp $SOURCE_ROOT/falco/build/userspace/falco/falco $ARTIFACT_ROOT/usr/bin/falco
+          cp $SOURCE_ROOT/falco/build/container_plugin-prefix/src/container_plugin/libcontainer.so $ARTIFACT_ROOT/usr/share/falco/plugins
+
+          cp $SOURCE_ROOT/plugins/plugins/k8saudit/rules/*.yaml $ARTIFACT_ROOT/etc/falco/default_rules
+          cp $SOURCE_ROOT/plugins/plugins/k8saudit/libk8saudit.so $ARTIFACT_ROOT/usr/share/falco/plugins
+
+      - name: Create tarball
+        run: |
+          TARBALL=falco-${{ steps.version.outputs.falco_version }}-linux-"$(uname -r)".tar.gz
+
+          cd $ARTIFACT_ROOT
+          tar -czf $TARBALL *
+          sha256sum $TARBALL > $TARBALL.sha256
+
+          # Move to back to workspace for upload
+          mv $TARBALL $TARBALL.sha256 ${{ github.workspace }}/
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: falco-binary-${{ steps.version.outputs.falco_version }}
+          path: |
+            falco-*.tar.gz
+            falco-*.tar.gz.sha256
+          retention-days: 30
+
+  create-release:
+    name: Create GitHub Release
+    needs: [build-falco]
+    runs-on: ubuntu-24.04
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: falco-binary-${{ needs.build-falco.outputs.falco-version }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Falco ${{ needs.build-falco.outputs.falco-version }}
+          tag_name: falco-${{ needs.build-falco.outputs.falco-version }}
+          body: |
+            # Falco binary release for Falco Operator
+
+            This release contains Falco version **${{ needs.build-falco.outputs.falco-version }}** built from source.
+
+            ## What's Included
+
+            - Falco binary at version: **${{ needs.build-falco.outputs.falco-version }}**
+            - Falco k8saudit at plugin version: **${{ needs.build-falco.outputs.k8saudit-plugin-version }}**
+            - Default rules for Falco and its plugins
+            ```
+          files: |
+            falco-*.tar.gz
+            falco-*.tar.gz.sha256
+          draft: false
+          prerelease: false

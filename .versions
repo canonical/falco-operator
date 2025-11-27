@@ -1,0 +1,5 @@
+# Falco version to build from source
+FALCO_VERSION=0.42.1
+
+# Falco plugins version to build from source
+FALCO_K8SAUDIT_PLUGIN_VERSION=0.16.0
