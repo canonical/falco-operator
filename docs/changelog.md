@@ -11,9 +11,9 @@ Each revision is versioned by the date of the revision.
 Set up initial Falco operator project.
 
 ### Changed
-- Updated __charm_name__ from template placeholder to `falco`
 - Updated `charmcraft.yaml` with Falco-specific configuration
 - Updated `README.md` with minimal Falco operator information
 - Updated `CONTRIBUTING.md` with minimal documentation
 - Updated Python dependencies in `pyproject.toml` and `uv.lock`
 - Clean up charm implementation from the template
+- Clean up docs content from initial template placeholder

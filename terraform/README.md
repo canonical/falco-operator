@@ -1,8 +1,6 @@
-<!-- Remember to update this file for your charm -- replace falco with the appropriate name. -->
+# Falco Terraform module
 
-# falco Terraform module
-
-This folder contains a base [Terraform][Terraform] module for the falco charm.
+This folder contains a base [Terraform][Terraform] module for the Falco charm.
 
 The module uses the [Terraform Juju provider][Terraform Juju provider] to model the charm
 deployment onto any Kubernetes environment managed by [Juju][Juju].

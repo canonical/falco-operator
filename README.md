@@ -28,4 +28,3 @@ You can find the full list of integrations [here](https://charmhub.io/falco/inte
 * [Issues](https://github.com/canonical/falco-operator/issues)
 * [Contributing](https://github.com/canonical/falco-operator/blob/main/CONTRIBUTING.md)
 * [Matrix](https://matrix.to/#/#charmhub-charmdev:ubuntu.com)
-* [Launchpad](https://launchpad.net/~canonical-is-devops)

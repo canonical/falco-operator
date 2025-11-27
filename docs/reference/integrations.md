@@ -1,16 +1,18 @@
 # Integrations
 
-<!-- Use the template below to add information about integrations supported by this charm. -->
+Falco support the following integrations with other charms.
 
-### Integration example
+### `general-info`
 
-_Interface_:   
-_Supported charms_: 
+<!-- vale Canonical.004-Canonical-product-names = NO -->
+_Interface_: juju-info
+<!-- vale Canonical.004-Canonical-product-names = YES -->
+_Supported charms_: any principal charms
 
-Description here.
+Falco is a subordinate charm, it needs to be integrated with a principal charm via this interface.
 
-Example <integration-name> integrate command: 
+Example `general-info` integrate command:
 
 ```
-juju integrate falco <supported-charm>:<integration-name>
+juju integrate falco ubuntu
 ```
