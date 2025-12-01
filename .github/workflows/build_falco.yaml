@@ -4,19 +4,23 @@
 name: Build Falco Binary
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - ".versions"
-      - ".github/workflows/build_falco.yaml"
   pull_request:
     branches:
       - main
     paths:
       - ".versions"
       - ".github/workflows/build_falco.yaml"
-  workflow_dispatch:
+  workflow_call:
+    outputs:
+      arch:
+        description: "The architecture string"
+        value: ${{ jobs.build-falco.outputs.arch }}
+      falco-version:
+        description: "The falco version string"
+        value: ${{ jobs.build-falco.outputs.falco-version }}
+      k8saudit-plugin-version:
+        description: "The k8saudit plugin version string"
+        value: ${{ jobs.build-falco.outputs.k8saudit-plugin-version }}
 
 jobs:
   build-falco:
@@ -150,38 +154,3 @@ jobs:
           path: |
             falco-*.tar.gz
           retention-days: 30
-
-  create-release:
-    name: Create GitHub Release
-    needs: [build-falco]
-    runs-on: ubuntu-24.04
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v6.0.0
-
-      - name: Download build artifacts
-        uses: actions/download-artifact@v6.0.0
-        with:
-          pattern: falco-${{ needs.build-falco.outputs.falco-version }}-*
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2.5.0
-        with:
-          name: ${{ needs.build-falco.outputs.falco-version }}
-          tag_name: falco/${{ needs.build-falco.outputs.falco-version }}
-          body: |
-            # Falco binary release for Falco Operator
-
-            This release contains the Falco binary for Falco Operator.
-
-            ## What's Included
-
-            - Falco binary at version: **${{ needs.build-falco.outputs.falco-version }}**
-            - Falco k8saudit at plugin version: **${{ needs.build-falco.outputs.k8saudit-plugin-version }}**
-            - Default rules for Falco
-            - Default rules for k8saudit plugin
-          files: |
-            falco-*.tar.gz
-          draft: false
-          prerelease: false

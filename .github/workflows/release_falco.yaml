@@ -1,0 +1,50 @@
+# Copyright 2025 Canonical Ltd.
+# See LICENSE file for licensing details.
+
+name: Release Falco Binary
+
+on:
+  push:
+    tags:
+      - "falco/*"
+
+jobs:
+  build-falco:
+    uses: ./.github/workflows/build_falco.yaml
+    secrets: inherit
+
+  create-release:
+    name: Create Falco Release
+    needs: [build-falco]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6.0.0
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v6.0.0
+        with:
+          pattern: falco-${{ needs.build-falco.outputs.falco-version }}-*
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2.5.0
+        with:
+          name: ${{ needs.build-falco.outputs.falco-version }}
+          tag_name: falco/${{ needs.build-falco.outputs.falco-version }}
+          body: |
+            # Falco binary release for Falco Operator
+
+            This release contains the Falco binary for Falco Operator.
+
+            ## What's Included
+
+            - Falco binary at version: **${{ needs.build-falco.outputs.falco-version }}**
+            - Falco k8saudit at plugin version: **${{ needs.build-falco.outputs.k8saudit-plugin-version }}**
+            - Default rules for Falco
+            - Default rules for k8saudit plugin
+          files: |
+            falco-*.tar.gz
+          draft: false
+          prerelease: false
