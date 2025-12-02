@@ -58,6 +58,7 @@ jobs:
         with:
           run-id: ${{ steps.latest_build_workflow_run.outputs.id }}
           pattern: falco-${{ steps.version.outputs.falco_version }}-*
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create Release
         uses: softprops/action-gh-release@v2.5.0
