@@ -119,7 +119,7 @@ jobs:
 
           # Display and verify build output
           ls -lrh  $FALCO_PLUGINS_SOURCE/json/plugins/json/libjson.so
-          ls -lrh  $FALCO_PLUGINS_SOURCE/k8saudit/plugins/json/libk8saudit.so
+          ls -lrh  $FALCO_PLUGINS_SOURCE/k8saudit/plugins/k8saudit/libk8saudit.so
 
       - name: Prepare artifacts
         run: |
