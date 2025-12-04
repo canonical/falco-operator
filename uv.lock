@@ -262,6 +262,7 @@ dependencies = [
     { name = "cosl" },
     { name = "jinja2" },
     { name = "ops" },
+    { name = "pydantic" },
 ]
 
 [package.dev-dependencies]
@@ -304,6 +305,7 @@ requires-dist = [
     { name = "cosl", specifier = ">=1.4.0" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "ops", specifier = "==3.4.0" },
+    { name = "pydantic", specifier = ">=2.12.5" },
 ]
 
 [package.metadata.requires-dev]
