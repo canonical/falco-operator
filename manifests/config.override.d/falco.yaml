@@ -1,7 +1,7 @@
 ##################################################################
 #               Custom Falco config file example                 #
 #                                                                #
-#  For more information about the configuraiton please refer to  #
+#  For more information about the configuration please refer to  #
 #  https://falco.org/docs/reference/daemon/config-options/       #
 #                                                                #
 #  It is recommended to not directly modify this file. Instead   #

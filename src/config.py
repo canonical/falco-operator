@@ -124,7 +124,7 @@ class SettingRepoManager:
 
         ssh_key_id = self.charm_config.setting_repo_ssh_key_id.id
         ssh_key_secret = self.model.get_secret(id=ssh_key_id)
-        ssh_key_content = ssh_key_secret.get_content()
+        ssh_key_content = ssh_key_secret.get_content(refresh=True)
         return ssh_key_content.get("value", "")
 
     def sync(self, falco_layout: FalcoLayout) -> bool:

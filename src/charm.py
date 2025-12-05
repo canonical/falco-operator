@@ -63,22 +63,26 @@ class Charm(ops.CharmBase):
             logger.info("No custom setting repository configured")
             return
 
-        try:
-            setting_repo_manager = SettingRepoManager(self.model, charm_config)
-            setting_repo_manager.sync(self.falco_layout)
-            self.falco_service.configure()
-        except pydantic.ValidationError as e:
-            logger.exception("Configuration validation error: %s", e)
-            self.unit.status = ops.BlockedStatus("Invalid configuration")
-        except (ValueError, GitCloneError, SshKeyScanError, RsyncError) as e:
-            logger.exception("Failed to clone custom setting repository: %s", e)
-            self.unit.status = ops.BlockedStatus("Failed to clone setting repo")
+        setting_repo_manager = SettingRepoManager(self.model, charm_config)
+        setting_repo_manager.sync(self.falco_layout)
+        self.falco_service.configure()
 
     def reconcile(self, _: ops.EventBase) -> None:
         """Reconcile the charm state."""
-        self._configure()
+        try:
+            self._configure()
+        except pydantic.ValidationError as e:
+            logger.exception("Configuration validation error: %s", e)
+            self.unit.status = ops.BlockedStatus("Invalid configuration")
+            return
+        except (ValueError, GitCloneError, SshKeyScanError, RsyncError) as e:
+            logger.exception("Failed to clone custom setting repository: %s", e)
+            self.unit.status = ops.BlockedStatus("Failed to clone setting repo")
+            return
+
         if not self.falco_service.check_active():
             raise RuntimeError("Falco service is not running")
+
         self.unit.status = ops.ActiveStatus()
 
 
