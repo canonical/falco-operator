@@ -61,6 +61,11 @@ class Charm(ops.CharmBase):
         charm_config = self.load_config(CharmConfig)
         if not charm_config.setting_repo:
             logger.info("No custom setting repository configured")
+            logger.debug("Clearing any existing custom settings")
+            for i in self.falco_layout.rules_dir.glob("*.yaml"):
+                i.unlink()
+            for i in self.falco_layout.configs_dir.glob("*.yaml"):
+                i.unlink()
             return
 
         setting_repo_manager = SettingRepoManager(self.model, charm_config)
