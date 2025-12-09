@@ -154,12 +154,12 @@ class TestCharmConfigHandling:
 
         context = ops.testing.Context(charm_type=Falco, charm_root=mock_charm_dir)
         state_in = ops.testing.State(
-            config={"custom-config-repository": "git+ssh://github.com/user/repo.git"}
+            config={"custom-config-repository": "git+ssh://user@github.com/owner/repo.git"}
         )
 
         with context(context.on.config_changed(), state_in) as mgr:
             state = mgr.charm.state
-            assert state.custom_config_repo == AnyUrl("git+ssh://github.com/user/repo.git")
+            assert state.custom_config_repo == AnyUrl("git+ssh://user@github.com/owner/repo.git")
             assert state.custom_config_repo_ref == ""
             state_out = mgr.run()
             mock_service.configure.assert_called_once()
@@ -176,12 +176,14 @@ class TestCharmConfigHandling:
 
         context = ops.testing.Context(charm_type=Falco, charm_root=mock_charm_dir)
         state_in = ops.testing.State(
-            config={"custom-config-repository": "git+ssh://github.com/user/repo.git@production"}
+            config={
+                "custom-config-repository": "git+ssh://user@github.com/owner/repo.git@production"
+            }
         )
 
         with context(context.on.config_changed(), state_in) as mgr:
             state = mgr.charm.state
-            assert state.custom_config_repo == AnyUrl("git+ssh://github.com/user/repo.git")
+            assert state.custom_config_repo == AnyUrl("git+ssh://user@github.com/owner/repo.git")
             assert state.custom_config_repo_ref == "production"
             state_out = mgr.run()
             mock_service.configure.assert_called_once()
@@ -208,10 +210,10 @@ class TestCharmConfigHandling:
             assert state_out.unit_status == ops.testing.ActiveStatus()
 
     @patch("charm.FalcoService")
-    def test_config_changed_validation_error(
+    def test_config_changed_validation_error_empty_url(
         self, mock_service_class, mock_charm_dir, mock_falco_layout
     ):
-        """Test config_changed with validation error."""
+        """Test config_changed with validation error: empty url."""
         mock_service = MagicMock()
         mock_service_class.return_value = mock_service
 
@@ -219,6 +221,42 @@ class TestCharmConfigHandling:
 
         # "" is an invalid URL
         state_in = ops.testing.State(config={"custom-config-repository": ""})
+        state_out = context.run(context.on.config_changed(), state_in)
+
+        assert state_out.unit_status == ops.testing.BlockedStatus("Invalid charm config")
+
+    @patch("charm.FalcoService")
+    def test_config_changed_validation_error_wrong_schema(
+        self, mock_service_class, mock_charm_dir, mock_falco_layout
+    ):
+        """Test config_changed with validation error: wrong schema."""
+        mock_service = MagicMock()
+        mock_service_class.return_value = mock_service
+
+        context = ops.testing.Context(charm_type=Falco, charm_root=mock_charm_dir)
+
+        # "" is an invalid URL
+        state_in = ops.testing.State(
+            config={"custom-config-repository": "https://github.com/owner/repo.git"}
+        )
+        state_out = context.run(context.on.config_changed(), state_in)
+
+        assert state_out.unit_status == ops.testing.BlockedStatus("Invalid charm config")
+
+    @patch("charm.FalcoService")
+    def test_config_changed_validation_error_missing_user(
+        self, mock_service_class, mock_charm_dir, mock_falco_layout
+    ):
+        """Test config_changed with validation error: missing user."""
+        mock_service = MagicMock()
+        mock_service_class.return_value = mock_service
+
+        context = ops.testing.Context(charm_type=Falco, charm_root=mock_charm_dir)
+
+        # "" is an invalid URL
+        state_in = ops.testing.State(
+            config={"custom-config-repository": "git+ssh://github.com/owner/repo.git"}
+        )
         state_out = context.run(context.on.config_changed(), state_in)
 
         assert state_out.unit_status == ops.testing.BlockedStatus("Invalid charm config")
@@ -234,7 +272,7 @@ class TestCharmConfigHandling:
 
         context = ops.testing.Context(charm_type=Falco, charm_root=mock_charm_dir)
         state_in = ops.testing.State(
-            config={"custom-config-repository": "git+ssh://github.com/user/repo.git"}
+            config={"custom-config-repository": "git+ssh://git@github.com/owner/repo.git"}
         )
         state_out = context.run(context.on.config_changed(), state_in)
 
