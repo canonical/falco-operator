@@ -10,12 +10,21 @@ import typing
 
 import ops
 
-from service import FalcoConfig, FalcoLayout, FalcoService, FalcoServiceFile
+from config import InvalidCharmConfigError
+from service import (
+    FalcoConfigFile,
+    FalcoConfigurationError,
+    FalcoCustomSetting,
+    FalcoLayout,
+    FalcoService,
+    FalcoServiceFile,
+)
+from state import CharmBaseWithState, CharmState
 
 logger = logging.getLogger(__name__)
 
 
-class Charm(ops.CharmBase):
+class Falco(CharmBaseWithState):
     """Falco subordinate charm.
 
     This charm deploys and manages Falco, an open-source runtime security tool.
@@ -26,15 +35,29 @@ class Charm(ops.CharmBase):
         """Charm the service."""
         super().__init__(*args)
 
+        self._state = None
+
         self.falco_layout = FalcoLayout(base_dir=self.charm_dir / "falco")
-        self.falco_service_file = FalcoServiceFile(self.falco_layout)
-        self.managed_falco_config = FalcoConfig(self.falco_layout, self)
-        self.falco_service = FalcoService(self.managed_falco_config, self.falco_service_file)
+        self.falco_service_file = FalcoServiceFile(self.falco_layout, self)
+        self.managed_falco_config = FalcoConfigFile(self.falco_layout)
+        self.custom_falco_setting = FalcoCustomSetting(self.falco_layout)
+        self.falco_service = FalcoService(
+            self.managed_falco_config, self.falco_service_file, self.custom_falco_setting
+        )
 
         self.framework.observe(self.on.remove, self._on_remove)
         self.framework.observe(self.on.install, self._on_install_or_upgrade)
         self.framework.observe(self.on.upgrade_charm, self._on_install_or_upgrade)
-        self.framework.observe(self.on.update_status, self._update_status)
+
+        self.framework.observe(self.on.config_changed, self.reconcile)
+        self.framework.observe(self.on.secret_changed, self.reconcile)
+
+    @property
+    def state(self) -> CharmState:
+        """The charm state."""
+        if self._state is None:
+            self._state = CharmState.from_charm(self)
+        return self._state
 
     def _on_remove(self, _: ops.RemoveEvent) -> None:
         """Handle remove event."""
@@ -45,18 +68,23 @@ class Charm(ops.CharmBase):
         """Handle install or upgrade charm event."""
         self.unit.status = ops.MaintenanceStatus("Installing Falco service")
         self.falco_service.install()
-        self.reconcile()
 
-    def _update_status(self, _: ops.UpdateStatusEvent) -> None:
-        """Update the unit status."""
-        self.reconcile()
-
-    def reconcile(self) -> None:
+    def reconcile(self, _: ops.EventBase) -> None:
         """Reconcile the charm state."""
+        try:
+            self.falco_service.configure(self.state)
+        except InvalidCharmConfigError:
+            self.unit.status = ops.BlockedStatus("Invalid charm config")
+            return
+        except FalcoConfigurationError:
+            self.unit.status = ops.BlockedStatus("Failed configuring Falco")
+            return
+
         if not self.falco_service.check_active():
             raise RuntimeError("Falco service is not running")
+
         self.unit.status = ops.ActiveStatus()
 
 
 if __name__ == "__main__":  # pragma: nocover
-    ops.main(Charm)
+    ops.main(Falco)

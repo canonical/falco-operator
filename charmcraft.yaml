@@ -60,7 +60,37 @@ parts:
 
 config:
   options:
+    custom-config-repository:
+      type: string
+      description: |
+        A repository URL where configuration files are stored. The URL must be provided in the
+        format git+ssh://username@repository@ref, where 'username' is mandatory and 'ref' is
+        optional and may be either a branch name or tag name. Tags are encouraged for
+        reproducibility and for efficiency and branch is discouraged to used. However, if a branch
+        is provided, the charm will re-pull the configuration on most charm events, as it cannot
+        guarantee that it has the latest commits otherwise. The following paths, if they exist in
+        the repository, will be synced over to the paths in the charm filesystem:
 
+        * <charm_dir>/falco/etc/falco/rules.d/
+        * <charm_dir>/falco/etc/falco/config.override.d/
+
+        The custom config repository should have the following structure
+
+        settting-repo
+        ├── config.override.d/
+        │   ├── a.yaml
+        │   └── b.yaml
+        └── rules.d/
+            ├── a.yaml
+            └── b.yaml
+    custom-config-repo-ssh-key:
+      type: secret
+      description: |
+        The Juju secret ID corresponding to the private key for SSH authentication to the git repository. The secret
+        should contain a single key, `value`, which maps to the actual SSH key. To create the secret, run the following
+        command. and use the secret ID output to configure this option.
+
+        `juju add-secret custom-config-repo-ssh-key value=<ssh-key> && juju grant-secret custom-config-repo-ssh-key <falco-operator>`
 requires:
   general-info:
     interface: juju-info
