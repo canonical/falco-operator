@@ -12,6 +12,7 @@ Add `./falcosidekick-k8s-operator` to the monorepo.
 
 ### Added
 - Add falcosidekick rock image definition to monorepo.
+- Add falcosidekick-k8s-operator to monorepo.
 
 ### Changed
 - Update CI workflows to support `./falcosidekick-k8s-operator` directory.
