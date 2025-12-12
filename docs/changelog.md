@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Each revision is versioned by the date of the revision.
 
+## 2025-12-10
+
+Migrate the repository to a monorepo structure.
+
 ## 2025-12-05
 
 Add configuration for falco.

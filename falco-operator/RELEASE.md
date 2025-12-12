@@ -1,10 +1,10 @@
-# Falco Binary Release
+# Falco binary release
 
 This guide outlines the process for creating a new Falco binary release for the Falco Operator.
 
 ## Overview
 
-This document describes the [build](.github/workflows/build_falco.yaml) and [release](.github/workflows/release_falco.yaml)
+This document describes the [build](../.github/workflows/build_falco.yaml) and [release](../.github/workflows/release_falco.yaml)
 process for Falco binary. This Falco binary is used by the Falco Operator, and it includes:
 
 - Falco binary
@@ -12,9 +12,9 @@ process for Falco binary. This Falco binary is used by the Falco Operator, and i
 - Falco default rules
 - Falco k8saudit plugin default rules
 
-## Falco Binary Release Process
+## Falco binary release process
 
-### 1. Update Version Information
+### Update version information
 
 > [!NOTE]
 > This step is typically performed by the renovate bot. Manual updates are only necessary if you are creating a release
@@ -28,7 +28,7 @@ References:
 - [Falco Releases](https://github.com/falcosecurity/falco/releases)
 - [Falco Plugins Releases](https://github.com/falcosecurity/plugins/releases)
 
-### 2. Create a Pull Request
+### Create a pull request
 
 > [!NOTE]
 > This step is typically performed by the renovate bot. Manual updates are only necessary if you are creating a release
@@ -45,7 +45,7 @@ git push origin update-falco-version
 
 The pull request will trigger a test build to verify the build process completes successfully.
 
-### 3. Review Build Artifacts (optional)
+### Review build artifacts (optional)
 
 Once the PR is created, the `Build Falco Binary` workflow will run automatically:
 
@@ -54,15 +54,15 @@ Once the PR is created, the `Build Falco Binary` workflow will run automatically
 3. Review the build logs for any warnings or errors
 4. Download and inspect the artifacts if needed (available for 30 days)
 
-### 4. Merge to Main Branch
+### Merge to main branch
 
 After the pull request is reviewed and approved, merge the pull request to the `main` branch.
 
-### 5. Create a GitHub Release
+### Create a github release
 
-Merging the PR to `main` will trigger the [Create Falco Release](.github/workflows/release_falco.yaml) workflow.
+Merging the PR to `main` will trigger the [Create Falco Release](../.github/workflows/release_falco.yaml) workflow.
 
-### 6. Verify the Release
+### Verify the release
 
 After the workflow completes:
 
@@ -84,13 +84,15 @@ tar -xzf falco-<version>-x86_64.tar.gz
 
 ## Troubleshooting
 
-### Version Compatibility
+If you have any issue, please follow the steps below to do the troubleshooting:
+
+### Version compatibility
 
 Ensure compatibility between Falco and plugin versions:
 - Check the [Falco documentation](https://falco.org/docs/) for plugin compatibility
 - Review the plugin release notes for supported Falco versions
 
-## Additional Resources
+## Additional resources
 
 - [Falco Releases](https://github.com/falcosecurity/falco/releases)
 - [Falco Plugins Releases](https://github.com/falcosecurity/plugins/releases)

@@ -8,7 +8,7 @@ name: Terraform module tests
 on:
   pull_request:
     paths:
-      - 'terraform/**'
+      - './**/terraform/**'
 
 permissions:
   contents: read
@@ -16,7 +16,7 @@ permissions:
 jobs:
   test-terraform:
     # remove this condition for enabling the workflow
-    if: false 
+    if: false
     name: Test Terraform with Juju
     runs-on: ubuntu-latest
     env:

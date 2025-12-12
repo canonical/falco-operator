@@ -7,7 +7,11 @@ jobs:
   unit-tests:
     uses: canonical/operator-workflows/.github/workflows/test.yaml@main
     secrets: inherit
+    strategy:
+      matrix:
+        charm: ["falco"]
     with:
       self-hosted-runner: true
       self-hosted-runner-label: "edge"
       with-uv: true
+      working-directory: './${{ matrix.charm }}-operator'
