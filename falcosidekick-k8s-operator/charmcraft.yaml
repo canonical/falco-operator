@@ -1,0 +1,44 @@
+# Copyright 2025 Canonical Ltd.
+# See LICENSE file for licensing details.
+# This file configures Charmcraft.
+# See https://canonical-charmcraft.readthedocs-hosted.com/stable/howto/manage-charmcraft/
+# for guidance.
+
+name: falcosidekick-k8s
+type: charm
+title: Falcosidekick K8s Operator
+summary: Juju charmed operator for Falcosidekick
+description: |
+  The Falcosidekick K8s Operator is a Juju charmed operator that simplifies the deployment
+  and management of Falcosidekick, an open-source daemon for connecting Falco to your ecosystem.
+
+links:
+  contact: https://launchpad.net/~canonical-is-devops
+  documentation: https://charmhub.io/falcosidekick-k8s
+  issues: https://github.com/canonical/falco-operators/issues
+  source: https://github.com/canonical/falco-operators
+
+platforms:
+  ubuntu@24.04:amd64:
+
+assumes:
+  - k8s-api
+
+parts:
+  charm:
+    source: .
+    plugin: uv
+    build-snaps:
+      - astral-uv
+
+config:
+  options:
+
+containers:
+  falcosidekick:
+    resource: falcosidekick
+
+resources:
+  falcosidekick:
+    type: oci-image
+    description: OCI image for the falcosidekick container

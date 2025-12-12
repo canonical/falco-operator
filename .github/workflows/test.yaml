@@ -9,7 +9,7 @@ jobs:
     secrets: inherit
     strategy:
       matrix:
-        charm: ["falco"]
+        charm: ["falco", "falcosidekick-k8s"]
     with:
       self-hosted-runner: true
       self-hosted-runner-label: "edge"

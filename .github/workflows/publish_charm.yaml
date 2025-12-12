@@ -15,6 +15,8 @@ jobs:
         include:
           - charm: "falco"
             charnnel: "0.42/edge"
+          - charm: "falcosidekick-k8s"
+            charnnel: "2/edge"
     with:
       channel: ${{ matrix.charnnel }}
       identifier: ${{ matrix.charm }}

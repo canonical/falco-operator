@@ -8,6 +8,17 @@ Each revision is versioned by the date of the revision.
 
 ## 2025-12-10
 
+Add `./falcosidekick-k8s-operator` to the monorepo.
+
+### Added
+- Add falcosidekick rock image definition to monorepo.
+- Add falcosidekick-k8s-operator to monorepo.
+
+### Changed
+- Update CI workflows to support `./falcosidekick-k8s-operator` directory.
+
+## 2025-12-10
+
 Migrate the repository to a monorepo structure.
 
 ## 2025-12-05
