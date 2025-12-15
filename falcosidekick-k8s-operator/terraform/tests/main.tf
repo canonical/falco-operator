@@ -28,6 +28,6 @@ module "falcosidekick-k8s" {
   source     = "./.."
   app_name   = "falcosidekick-k8s"
   channel    = var.channel
-  model_uuid = "prod-falcosidekick-k8s-example"
+  model_uuid = var.model_uuid
   revision   = var.revision
 }
