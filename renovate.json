@@ -55,6 +55,16 @@
         "# renovate: depName=(?<depName>.*?)\\n\\s+VERSION=(?<currentValue>.*)"
       ],
       "extractVersionTemplate": "^falco/(?<version>.*)$"
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-tags",
+      "description": "Update Falcosidekick version in rockcraft from git tags (semver)",
+      "fileMatch": ["rockcraft.yaml"],
+      "matchStrings": [
+        "# renovate: depName=(?<depName>.*?)\\n\\s+source-tag:\\s\"(?<currentValue>.*)\""
+      ],
+      "versioningTemplate": "semver"
     }
   ],
   "extends": [

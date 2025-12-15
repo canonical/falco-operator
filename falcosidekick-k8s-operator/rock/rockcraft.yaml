@@ -2,6 +2,7 @@
 # See LICENSE file for licensing details.
 
 name: falcosidekick
+# renovate: base: ubuntu:24.04@sha256:c35e29c9450151419d9448b0fd75374fec4fff364a27f176fb458d472dfc9e54
 base: ubuntu@24.04
 adopt-info: "falcosidekick"
 summary: Falcosidekick - Connect Falco to your ecosystem
@@ -33,7 +34,8 @@ parts:
   falcosidekick:
     plugin: go
     source: https://github.com/falcosecurity/falcosidekick.git
-    source-tag: "2.23.0"
+    # renovate: depName=falcosecurity/falcosidekick
+    source-tag: "2.32.0"
     build-snaps:
       - go/1.25/stable
     build-packages:
