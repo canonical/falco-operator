@@ -4,7 +4,7 @@
 variable "channel" {
   description = "The channel to use when deploying a charm."
   type        = string
-  default     = "2.32.0/edge"
+  default     = "2/edge"
 }
 
 variable "revision" {
@@ -16,7 +16,7 @@ variable "revision" {
 terraform {
   required_providers {
     juju = {
-      version = "~> 0.20.0"
+      version = "~> 1.1.1"
       source  = "juju/juju"
     }
   }
@@ -25,9 +25,9 @@ terraform {
 provider "juju" {}
 
 module "falcosidekick-k8s" {
-  source   = "./.."
-  app_name = "falcosidekick-k8s"
-  channel  = var.channel
-  model    = "prod-falcosidekick-k8s-example"
-  revision = var.revision
+  source     = "./.."
+  app_name   = "falcosidekick-k8s"
+  channel    = var.channel
+  model_uuid = "prod-falcosidekick-k8s-example"
+  revision   = var.revision
 }

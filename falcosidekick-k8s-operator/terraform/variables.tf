@@ -16,7 +16,7 @@ variable "base" {
 variable "channel" {
   description = "The channel to use when deploying a charm."
   type        = string
-  default     = "latest/stable"
+  default     = "2/stable"
 }
 
 variable "config" {
@@ -31,8 +31,8 @@ variable "constraints" {
   default     = ""
 }
 
-variable "model" {
-  description = "Reference to a `juju_model`."
+variable "model_uuid" {
+  description = "Reference to the uuid of a `juju_model`."
   type        = string
 }
 

@@ -2,7 +2,7 @@
 # See LICENSE file for licensing details.
 
 variables {
-  channel = "latest/edge"
+  channel = "2/edge"
   # renovate: depName="falcosidekick-k8s"
   revision = 1
 }
