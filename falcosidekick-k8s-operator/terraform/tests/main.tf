@@ -13,7 +13,13 @@ variable "revision" {
   default     = null
 }
 
+variable "model_uuid" {
+  description = "Reference to the uuid of a `juju_model`."
+  type        = string
+}
+
 terraform {
+  required_version = ">= 1.14.0"
   required_providers {
     juju = {
       version = "~> 1.1.1"
