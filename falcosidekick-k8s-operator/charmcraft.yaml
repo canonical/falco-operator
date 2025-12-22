@@ -24,6 +24,10 @@ platforms:
 assumes:
   - k8s-api
 
+charm-libs:
+  - lib: loki_k8s.loki_push_api
+    version: "1"
+
 parts:
   charm:
     source: .
@@ -48,3 +52,8 @@ resources:
   falcosidekick-image:
     type: oci-image
     description: OCI image for the falcosidekick container
+
+requires:
+  send_loki_logs:
+    limit: 1
+    interface: loki_push_api

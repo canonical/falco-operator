@@ -18,11 +18,15 @@ class TestCharmState:
     def test_charm_state_creation(self):
         """Test creating a CharmState instance.
 
-        Arrange: Prepare port value.
+        Arrange: Prepare port value and loki fields.
         Act: Create CharmState instance.
         Assert: CharmState has correct port value.
         """
-        state = CharmState(falcosidekick_listenport=8080)
+        state = CharmState(
+            falcosidekick_listenport=8080,
+            falcosidekick_loki_endpoint="/loki/api/v1/push",
+            falcosidekick_loki_hostport="http://loki:3100",
+        )
         assert state.falcosidekick_listenport == 8080
 
     @pytest.mark.parametrize(
@@ -45,8 +49,11 @@ class TestCharmState:
         mock_charm = MagicMock()
         mock_charm.load_config.return_value = CharmConfig(port=port)
 
+        mock_loki_relation = MagicMock()
+        mock_loki_relation.get_loki_http_url.return_value = None
+
         # Act
-        state = CharmState.from_charm(mock_charm)
+        state = CharmState.from_charm(mock_charm, mock_loki_relation)
 
         # Assert
         assert state.falcosidekick_listenport == port
@@ -76,9 +83,12 @@ class TestCharmState:
 
         mock_charm.load_config.side_effect = raise_validation_error
 
+        mock_loki_relation = MagicMock()
+        mock_loki_relation.get_loki_http_url.return_value = None
+
         # Act
         with pytest.raises(InvalidCharmConfigError) as exc_info:
-            CharmState.from_charm(mock_charm)
+            CharmState.from_charm(mock_charm, mock_loki_relation)
 
         # Assert
         assert "Invalid charm configuration: port" in str(exc_info.value)
@@ -99,9 +109,12 @@ class TestCharmState:
         except ValidationError as e:
             mock_charm.load_config.side_effect = e
 
+        mock_loki_relation = MagicMock()
+        mock_loki_relation.get_loki_http_url.return_value = None
+
         # Act
         with pytest.raises(InvalidCharmConfigError) as exc_info:
-            CharmState.from_charm(mock_charm)
+            CharmState.from_charm(mock_charm, mock_loki_relation)
 
         # Assert
         # Error message should contain the invalid configuration message

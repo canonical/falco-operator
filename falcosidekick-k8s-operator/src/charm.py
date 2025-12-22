@@ -11,10 +11,14 @@ import typing
 import ops
 
 from config import InvalidCharmConfigError
+from relations import LokiRelationManager, MissingLokiRelationError
 from state import CharmBaseWithState, CharmState
 from workload import Falcosidekick
 
 logger = logging.getLogger(__name__)
+
+# Defined in charmcraft.yaml
+LOKI_RELATION_NAME = "send_loki_logs"
 
 
 class FalcosidekickCharm(CharmBaseWithState):
@@ -37,10 +41,18 @@ class FalcosidekickCharm(CharmBaseWithState):
         self._state = None
 
         self.falcosidekick = Falcosidekick(self)
+        self.loki_relation = LokiRelationManager(self, relation_name=LOKI_RELATION_NAME)
 
         self.framework.observe(self.on.install, self._install)
         self.framework.observe(self.on.config_changed, self.reconcile)
         self.framework.observe(self.on.falcosidekick_pebble_ready, self.reconcile)
+
+        self.framework.observe(
+            self.loki_relation._loki_consumer.on.loki_push_api_endpoint_joined, self.reconcile
+        )
+        self.framework.observe(
+            self.loki_relation._loki_consumer.on.loki_push_api_endpoint_departed, self.reconcile
+        )
 
     @property
     def state(self) -> CharmState:
@@ -52,7 +64,7 @@ class FalcosidekickCharm(CharmBaseWithState):
             CharmState: The current state of the charm.
         """
         if self._state is None:
-            self._state = CharmState.from_charm(self)
+            self._state = CharmState.from_charm(self, self.loki_relation)
         return self._state
 
     def _install(self, _: ops.EventBase) -> None:
@@ -88,6 +100,10 @@ class FalcosidekickCharm(CharmBaseWithState):
         except InvalidCharmConfigError as e:
             logger.error("%s", e)
             self.unit.status = ops.BlockedStatus(str(e))
+            return
+        except MissingLokiRelationError as e:
+            logger.error("%s", e)
+            self.unit.status = ops.BlockedStatus("Required relations: [send_loki_logs]")
             return
 
         if not self.falcosidekick.health:
