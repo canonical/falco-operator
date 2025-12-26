@@ -135,7 +135,11 @@ class TestFalcosidekick:
         # Mock the config file install to return True (changed)
         with patch.object(FalcosidekickConfigFile, "install", return_value=True):
             falcosidekick = Falcosidekick(mock_charm)
-            charm_state = CharmState(falcosidekick_listenport=2801)
+            charm_state = CharmState(
+                falcosidekick_listenport=2801,
+                falcosidekick_loki_endpoint="/loki/api/v1/push",
+                falcosidekick_loki_hostport="http://loki:3100",
+            )
 
             # Act: Configure the workload
             falcosidekick.configure(charm_state)
@@ -163,7 +167,11 @@ class TestFalcosidekick:
         # Mock the config file install to return False (no change)
         with patch.object(FalcosidekickConfigFile, "install", return_value=False):
             falcosidekick = Falcosidekick(mock_charm)
-            charm_state = CharmState(falcosidekick_listenport=2801)
+            charm_state = CharmState(
+                falcosidekick_listenport=2801,
+                falcosidekick_loki_endpoint="/loki/api/v1/push",
+                falcosidekick_loki_hostport="http://loki:3100",
+            )
 
             # Act: Configure the workload
             falcosidekick.configure(charm_state)
@@ -187,7 +195,11 @@ class TestFalcosidekick:
         mock_charm.unit.get_container.return_value = mock_container
 
         falcosidekick = Falcosidekick(mock_charm)
-        charm_state = CharmState(falcosidekick_listenport=2801)
+        charm_state = CharmState(
+            falcosidekick_listenport=2801,
+            falcosidekick_loki_endpoint="/loki/api/v1/push",
+            falcosidekick_loki_hostport="http://loki:3100",
+        )
 
         # Act: Attempt to configure the workload
         with patch.object(FalcosidekickConfigFile, "install") as mock_install:

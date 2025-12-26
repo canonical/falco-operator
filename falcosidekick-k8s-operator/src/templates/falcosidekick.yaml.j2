@@ -10,3 +10,9 @@
 
 listenport: {{ charm_state.falcosidekick_listenport }}
 listenaddress: "" # ip address to bind falcosidekick to (default: "" meaning all addresses)
+
+{% if charm_state.falcosidekick_loki_hostport -%}
+loki:
+  endpoint: "{{ charm_state.falcosidekick_loki_endpoint }}"
+  hostport: "{{ charm_state.falcosidekick_loki_hostport }}"
+{% endif %}

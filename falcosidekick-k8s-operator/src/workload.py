@@ -10,6 +10,7 @@ import ops
 from jinja2 import Environment, FileSystemLoader
 
 import state
+from relations import MissingLokiRelationError
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +46,8 @@ class Template:
             context (dict): Context for rendering the template
 
         Returns:
-            True if there is change in configuration, False otherwise
+            True if there is change in configuration and the template is installed. Otherwise,
+            False if no changes detected and the template is not installed.
         """
         logger.debug("Generating template file at %s", self.destination)
         try:
@@ -62,6 +64,7 @@ class Template:
         if not self.container.isdir(parent_dir):
             self.container.make_dir(parent_dir, make_parents=True)
 
+        logger.debug("Installing template file at %s", self.destination)
         self.container.push(self.destination, new_content, encoding="utf-8")
         return True
 
@@ -181,6 +184,11 @@ class Falcosidekick:
         if not self.ready:
             logger.warning("Cannot configure; container is not ready")
             return
+
+        if not charm_state.falcosidekick_loki_hostport:
+            raise MissingLokiRelationError(
+                "Loki relation is missing; Falcosidekick requires at least one output"
+            )
 
         changed = self.config_file.install(context={"charm_state": charm_state})
         if not changed:
