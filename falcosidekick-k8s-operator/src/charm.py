@@ -17,7 +17,6 @@ from workload import Falcosidekick
 
 logger = logging.getLogger(__name__)
 
-# Defined in charmcraft.yaml
 LOKI_RELATION_NAME = "send-loki-logs"
 
 
