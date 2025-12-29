@@ -12,7 +12,6 @@ resource "juju_application" "falco" {
     revision = var.revision
   }
 
-  units       = 0
   config      = var.config
   constraints = var.constraints
 }
