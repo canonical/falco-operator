@@ -12,6 +12,10 @@ Each revision is versioned by the date of the revision.
 
 Add documentation workflows and RTD set up.
 
+### Removed
+
+- Removed unused files tflint.hcl
+
 ## 2025-12-29
 
 Add integration between falcosidekick-k8s-operator and loki-k8s-operator.
