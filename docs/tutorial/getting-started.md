@@ -21,7 +21,7 @@ should have at least 4 CPU cores, 8 GB of RAM, and 50 GB of disk space.
 
 > When using a Multipass VM, make sure to replace IP addresses with the
 > VM IP in steps that assume you're running locally. To get the IP address of the
-> Multipass instance run ```multipass info charm-tutorial-vm```.
+> Multipass instance run `multipass info charm-tutorial-vm`.
 
 This tutorial requires the following software to be installed on your working station
 (either locally or in the Multipass VM):

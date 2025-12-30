@@ -3,6 +3,7 @@ myst:
   html_meta:
     "description lang=en": "A Juju charm deploying and managing Falco on physical or virtual machines."
 ---
+
 <!-- vale Canonical.007-Headings-sentence-case = NO -->
 
 # Falco operator
@@ -18,15 +19,14 @@ Like any Juju charm, this charm supports one-line deployment, configuration, int
 
 This charm will make operating Falco simple and straightforward for DevOps or SRE teams through
 Juju's clean interface. For information about how to deploy, integrate, and manage this charm, see
-the Official [Falco Operator Documentation](https://charmhub.io/falco).
+the Official [Falco Operator Documentation](https://charmhub.io/falco/docs).
 
 ## In this documentation
 
-| | |
-|--|--|
-|  [Tutorials](tutorial)</br>  Get started - a hands-on introduction to using the charm for new users </br> |  [How-to guides](how_to) </br> Step-by-step guides covering key operations and common tasks |
-| [Reference](reference) </br> Technical information - specifications, APIs, architecture | [Explanation](explanation) </br> Concepts - discussion and clarification of key topics  |
-| | |
+|                                                                                                         |                                                                                                  |
+| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| [Tutorial](/tutorial/index)</br> Get started - a hands-on introduction to using the charm for new users | [How-to guides](/how-to/index)</br> Step-by-step guides covering key operations and common tasks |
+| [Reference](/reference/index)</br> Technical information - specifications, APIs, architecture           | [Explanation](/explanation/index)</br> Concepts - discussion and clarification of key topics     |
 
 ## Contributing to this documentation
 
@@ -34,7 +34,6 @@ Documentation is an important part of this project, and we take the same open-so
 to the documentation as the code. As such, we welcome community contributions, suggestions, and
 constructive feedback on our documentation.
 See [How to contribute](how_to_contribute) for more information.
-
 
 If there's a particular area of documentation that you'd like to see that's missing, please
 [file a bug](https://github.com/canonical/falco-operators/issues).

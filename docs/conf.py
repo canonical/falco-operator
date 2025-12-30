@@ -22,17 +22,14 @@ import yaml
 
 # Project name
 #
-# TODO: Update with the official name of your project or product
-
-project = "Falco charm"
+project = "Falco operators"
 author = "Canonical Ltd."
 
 
 # Sidebar documentation title; best kept reasonably short
 #
-# TODO: To include a version number, add it here (hardcoded or automated).
-#
-# TODO: To disable the title, set to an empty string.
+# To include a version number, add it here (hardcoded or automated).
+# To disable the title, set to an empty string.
 
 html_title = project + " documentation"
 
@@ -65,17 +62,17 @@ copyright = "%s CC-BY-SA, %s" % (datetime.date.today().year, author)
 
 # Documentation website URL
 #
-# TODO: Update with the official URL of your docs or leave empty if unsure.
+# Update with the official URL of your docs or leave empty if unsure.
 #
 # NOTE: The Open Graph Protocol (OGP) enhances page display in a social graph
 #       and is used by social media platforms; see https://ogp.me/
 
-ogp_site_url = "https://canonical-starter-pack.readthedocs-hosted.com/"
+ogp_site_url = "https://documentation.ubuntu.com/falco-operators/"
 
 
 # Preview name of the documentation website
 #
-# TODO: To use a different name for the project in previews, update as needed.
+# To use a different name for the project in previews, update as needed.
 
 ogp_site_name = project
 
@@ -100,56 +97,55 @@ ogp_image = "https://assets.ubuntu.com/v1/cc828679-docs_illustration.svg"
 html_context = {
     # Product page URL; can be different from product docs URL
     #
-    # TODO: Change to your product website URL,
-    #       dropping the 'https://' prefix, e.g. 'ubuntu.com/lxd'.
+    # Change to your product website URL, dropping the 'https://' prefix, e.g. 'ubuntu.com/lxd'.
     #
-    # TODO: If there's no such website,
-    #       remove the {{ product_page }} link from the page header template
-    #       (usually .sphinx/_templates/header.html; also, see README.rst).
-    "product_page": "charmhub.io/falco",
+    # If there's no such website, remove the {{ product_page }} link from the page header template
+    # (usually .sphinx/_templates/header.html; also, see README.rst).
+    "product_page": "github.com/canonical/falco-operators",
     # Product tag image; the orange part of your logo, shown in the page header
     #
     # TODO: To add a tag image, uncomment and update as needed.
     # 'product_tag': '_static/tag.png',
+    #
     # Your Discourse instance URL
     #
-    # TODO: Change to your Discourse instance URL or leave empty.
+    # Change to your Discourse instance URL or leave empty.
     #
-    # NOTE: If set, adding ':discourse: 123' to an .rst file
-    #       will add a link to Discourse topic 123 at the bottom of the page.
+    # NOTE: If set, adding ':discourse: 123' to an .rst file will add a link to Discourse topic 123
+    #       at the bottom of the page.
     "discourse": "https://discourse.charmhub.io",
     # Your Mattermost channel URL
     #
-    # TODO: Change to your Mattermost channel URL or leave empty.
+    # Change to your Mattermost channel URL or leave empty.
     "mattermost": "",
     # Your Matrix channel URL
     #
-    # TODO: Change to your Matrix channel URL or leave empty.
+    # Change to your Matrix channel URL or leave empty.
     "matrix": "https://matrix.to/#/#charmhub-charmdev:ubuntu.com",
     # Your documentation GitHub repository URL
     #
-    # TODO: Change to your documentation GitHub repository URL or leave empty.
+    # Change to your documentation GitHub repository URL or leave empty.
     #
     # NOTE: If set, links for viewing the documentation source files
     #       and creating GitHub issues are added at the bottom of each page.
     "github_url": "https://github.com/canonical/falco-operators",
     # Docs branch in the repo; used in links for viewing the source files
     #
-    # TODO: To customise the branch, uncomment and update as needed.
+    # To customise the branch, uncomment and update as needed.
     'repo_default_branch': 'main',
     # Docs location in the repo; used in links for viewing the source files
     #
-
-
-    # TODO: To customise the directory, uncomment and update as needed.
+    # To customise the directory, uncomment and update as needed.
     "repo_folder": "/docs/",
+    #
     # TODO: To enable or disable the Previous / Next buttons at the bottom of pages
     # Valid options: none, prev, next, both
     # "sequential_nav": "both",
-    # TODO: To enable listing contributors on individual pages, set to True
-    "display_contributors": False,
-
-    # Required for feedback button    
+    #
+    # To enable listing contributors on individual pages, set to True
+    "display_contributors": True,
+    #
+    # Required for feedback button
     'github_issues': 'enabled',
 }
 
@@ -160,7 +156,7 @@ if os.getenv("OPENAPI", ""):
     tags.add("openapi")
     html_extra_path.append("how-to/assets/openapi.yaml")
 
-# TODO: To enable the edit button on pages, uncomment and change the link to a
+# To enable the edit button on pages, uncomment and change the link to a
 # public repository on GitHub or Launchpad. Any of the following link domains
 # are accepted:
 # - https://github.com/example-org/example"
@@ -168,15 +164,14 @@ if os.getenv("OPENAPI", ""):
 # - https://git.launchpad.net/example
 #
 html_theme_options = {
-"source_edit_link": "https://github.com/canonical/falco-operators",
+    "source_edit_link": "https://github.com/canonical/falco-operators",
 }
 
 # Project slug; see https://meta.discourse.org/t/what-is-category-slug/87897
 #
-# TODO: If your documentation is hosted on https://docs.ubuntu.com/,
-#       uncomment and update as needed.
+# If your documentation is hosted on https://docs.ubuntu.com/, uncomment and update as needed.
 
-# slug = ''
+slug = "falco-operators"
 
 #######################
 # Sitemap configuration: https://sphinx-sitemap.readthedocs.io/
@@ -202,8 +197,8 @@ sitemap_excludes = [
     'search/',
 ]
 
-# TODO: Add more pages to sitemap_excludes if needed. Wildcards are supported.
-#       For example, to exclude module pages generated by autodoc, add '_modules/*'.
+# Add more pages to sitemap_excludes if needed. Wildcards are supported.
+# For example, to exclude module pages generated by autodoc, add '_modules/*'.
 
 #######################
 # Template and asset locations
@@ -226,12 +221,12 @@ templates_path = ["_templates"]
 # NOTE: If undefined, set to None, or empty,
 #       the sphinx_reredirects extension will be disabled.
 
-redirects = {
-    'reference/doc-cheat-sheet-myst/': '../myst-syntax-reference',
-    'reference/doc-cheat-sheet/': '../rst-syntax-reference',
-    'reference/style-guide-myst/': '../myst-syntax-reference',
-    'reference/style-guide/': '../rst-syntax-reference',
-}
+# redirects = {
+#     'reference/doc-cheat-sheet-myst/': '../myst-syntax-reference',
+#     'reference/doc-cheat-sheet/': '../rst-syntax-reference',
+#     'reference/style-guide-myst/': '../myst-syntax-reference',
+#     'reference/style-guide/': '../rst-syntax-reference',
+# }
 
 
 ###########################
