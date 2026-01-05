@@ -10,10 +10,14 @@ import typing
 
 import ops
 
+from config import InvalidCharmConfigError
+from relations import LokiRelationManager, MissingLokiRelationError
 from state import CharmBaseWithState, CharmState
 from workload import Falcosidekick
 
 logger = logging.getLogger(__name__)
+
+LOKI_RELATION_NAME = "send-loki-logs"
 
 
 class FalcosidekickCharm(CharmBaseWithState):
@@ -24,35 +28,82 @@ class FalcosidekickCharm(CharmBaseWithState):
     """
 
     def __init__(self, *args: typing.Any):
-        """Charm the service."""
+        """Initialize the Falcosidekick charm.
+
+        Sets up the charm, initializes the workload, and observes relevant events.
+
+        Args:
+            *args: Variable length argument list passed to the parent class.
+        """
         super().__init__(*args)
 
         self._state = None
 
         self.falcosidekick = Falcosidekick(self)
+        self.loki_relation = LokiRelationManager(self, relation_name=LOKI_RELATION_NAME)
 
         self.framework.observe(self.on.install, self._install)
+        self.framework.observe(self.on.config_changed, self.reconcile)
         self.framework.observe(self.on.falcosidekick_pebble_ready, self.reconcile)
+
+        self.framework.observe(
+            self.loki_relation._loki_consumer.on.loki_push_api_endpoint_joined, self.reconcile
+        )
+        self.framework.observe(
+            self.loki_relation._loki_consumer.on.loki_push_api_endpoint_departed, self.reconcile
+        )
 
     @property
     def state(self) -> CharmState:
-        """The charm state."""
+        """Get the charm state.
+
+        Lazily initializes and caches the charm state from the current charm configuration.
+
+        Returns:
+            CharmState: The current state of the charm.
+        """
         if self._state is None:
-            self._state = CharmState.from_charm(self)
+            self._state = CharmState.from_charm(self, self.loki_relation)
         return self._state
 
     def _install(self, _: ops.EventBase) -> None:
-        """Handle the install event."""
+        """Handle the install event.
+
+        Sets the unit status to indicate that containers are being installed.
+
+        Args:
+            _: The placeholder for the install event.
+        """
         self.unit.status = ops.MaintenanceStatus("Installing containers")
 
     def reconcile(self, _: ops.EventBase) -> None:
-        """Reconcile the charm state."""
+        """Reconcile the charm state.
+
+        Ensures the Falcosidekick workload is configured correctly and running.
+        Updates the unit status based on workload readiness and health.
+
+        Args:
+            _: A placeholder for the event that triggered the reconciliation.
+
+        Raises:
+            RuntimeError: If the workload is not healthy after configuration.
+        """
         if not self.falcosidekick.ready:
             logger.warning("Pebble is not ready in '%s'", self.falcosidekick.container_name)
             self.unit.status = ops.WaitingStatus("Workload not ready")
             return
 
-        self.falcosidekick.configure()
+        try:
+            logger.info("Configuring '%s' workload", self.falcosidekick.container_name)
+            self.falcosidekick.configure(self.state)
+        except InvalidCharmConfigError as e:
+            logger.error("%s", e)
+            self.unit.status = ops.BlockedStatus(str(e))
+            return
+        except MissingLokiRelationError as e:
+            logger.error("%s", e)
+            self.unit.status = ops.BlockedStatus("Required relations: [send-loki-logs]")
+            return
 
         if not self.falcosidekick.health:
             logger.error("'%s' workload is not healthy", self.falcosidekick.container_name)

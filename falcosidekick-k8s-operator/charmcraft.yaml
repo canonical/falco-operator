@@ -24,6 +24,10 @@ platforms:
 assumes:
   - k8s-api
 
+charm-libs:
+  - lib: loki_k8s.loki_push_api
+    version: "1"
+
 parts:
   charm:
     source: .
@@ -33,6 +37,12 @@ parts:
 
 config:
   options:
+    port:
+      type: int
+      default: 2801
+      description: |
+        The port to listen for the falcosidekick daemon (default: 2801). Allowed values are between
+        1 and 65535.
 
 containers:
   falcosidekick:
@@ -42,3 +52,8 @@ resources:
   falcosidekick-image:
     type: oci-image
     description: OCI image for the falcosidekick container
+
+requires:
+  send-loki-logs:
+    limit: 1
+    interface: loki_push_api
