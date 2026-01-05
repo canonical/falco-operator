@@ -1,3 +1,8 @@
+---
+myst:
+  html_meta:
+    "description lang=en": "TBD"
+---
 <!-- vale Canonical.007-Headings-sentence-case = NO -->
 # Falco operator
 <!-- vale Canonical.007-Headings-sentence-case = YES -->
@@ -45,18 +50,11 @@ projects, contributions, suggestions, fixes, and constructive feedback.
 Thinking about using the falco Operator for your next project?
 [Get in touch](https://matrix.to/#/#charmhub-charmdev:ubuntu.com)!
 
-# Contents
-
-1. [Tutorial](tutorial/getting-started.md)
-1. [How to](how-to)aa
-  1. [Contribute](how-to/contribute.md)
-1. [Reference](reference)
-  1. [Actions](reference/actions.md)
-  1. [Configurations](reference/configurations.md)
-  1. [Integrations](reference/integrations.md)
-  1. [Metrics](reference/metrics.md)
-1. [Explanation](explanation)
-  1. [Architecture](explanation/architecture.md)
-  1. [Charm design](explanation/charm-design.md)
-  1. [Security](explanation/security.md)
-1. [Changelog](changelog.md)
+```{toctree}
+:hidden:
+explanation/index.md
+how-to/index.md
+reference/index.md
+tutorial/index.md
+changelog.md
+```

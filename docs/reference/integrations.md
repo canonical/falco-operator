@@ -1,3 +1,5 @@
+(reference_integrations)=
+
 # Integrations
 
 Falco supports the following integrations with other charms.

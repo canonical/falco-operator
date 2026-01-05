@@ -1,3 +1,5 @@
+(tutorial_getting_started)=
+
 # Deploy the Falco charm for the first time
 
 ## What you’ll do
