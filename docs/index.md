@@ -54,9 +54,9 @@ Thinking about using the falco Operator for your next project?
 
 ```{toctree}
 :hidden:
-explanation/index.md
+tutorial/index.md
 how-to/index.md
 reference/index.md
-tutorial/index.md
+explanation/index.md
 changelog.md
 ```
