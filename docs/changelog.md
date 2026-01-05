@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Each revision is versioned by the date of the revision.
 
+## 2026-01-05
+
+Add documentation workflows and RTD set up.
+
 ## 2025-12-29
 
 Add integration between falcosidekick-k8s-operator and loki-k8s-operator.
