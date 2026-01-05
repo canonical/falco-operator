@@ -6,7 +6,7 @@ myst:
 
 (explanation)=
 
-# docs/explanation
+# Explanation
 
 Description TBD
 

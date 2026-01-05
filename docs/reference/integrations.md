@@ -11,7 +11,7 @@ _Interface_: juju-info
 <!-- vale Canonical.004-Canonical-product-names = YES -->
 _Supported charms_: any principal charms
 
-Since Falco is a subordinate charm, it needs to be integrated with a principal charm via this interface.
+Since Falco is a subordinate charm, it needs to be integrated with a principal charm with this interface.
 
 Example `general-info` integrate command:
 

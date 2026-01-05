@@ -6,7 +6,7 @@ myst:
 
 (reference)=
 
-# docs/reference
+# Reference
 
 Description TBD
 

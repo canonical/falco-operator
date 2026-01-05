@@ -6,7 +6,7 @@ myst:
 
 (tutorial)=
 
-# docs/tutorial
+# Tutorial
 
 Description TBD
 

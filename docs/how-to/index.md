@@ -6,7 +6,7 @@ myst:
 
 (how_to)=
 
-# docs/how-to
+# How to
 
 Description TBD
 
