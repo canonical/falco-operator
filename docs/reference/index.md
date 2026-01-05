@@ -8,7 +8,7 @@ myst:
 
 # Reference
 
-Description TBD
+The pages in this section contain technical information for topics relevant to the Falco charms.
 
 ```{toctree}
 :maxdepth: 1
