@@ -1,7 +1,7 @@
 ---
 myst:
   html_meta:
-    "description lang=en": "TBD"
+    "description lang=en": "How-to guides covering the entire operations lifecycle of the Falco operators."
 ---
 
 (how_to)=
