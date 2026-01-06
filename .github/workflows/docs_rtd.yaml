@@ -2,8 +2,6 @@ name: RTD workflows
 
 on:
   pull_request:
-    paths:
-      - "./docs/**"
 
 jobs:
   rtd-docs-checks:

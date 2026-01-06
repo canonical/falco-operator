@@ -14,7 +14,7 @@ Update terraform modules.
 
 ### Changed
 
-- Update terraform juju provider to version >= 1.1.1
+- Update terraform Juju provider to version >= 1.1.1
 - Update terraform module for falco-operator
   - Update the channel for the falco-operator to "0.42/stable"
   - Update terraform tests to check for expected outputs
