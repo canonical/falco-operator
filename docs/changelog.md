@@ -8,13 +8,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Each revision is versioned by the date of the revision.
 
+## 2026-01-07
+
+Customize RTD configuration.
+
+### Changed
+
+- Update `docs/conf.py` to customize RTD configuration
+- Update `workflows/docs.yaml` to check for markdown files other than `docs`
+
 ## 2026-01-06
 
 Update terraform modules.
 
 ### Changed
 
-- Update terraform juju provider to version >= 1.1.1
+- Update terraform Juju provider to version >= 1.1.1
 - Update terraform module for falco-operator
   - Update the channel for the falco-operator to "0.42/stable"
   - Update terraform tests to check for expected outputs
