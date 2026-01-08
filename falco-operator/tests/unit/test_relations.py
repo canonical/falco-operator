@@ -3,61 +3,67 @@
 
 """Unit tests for relations module."""
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
+from charmlibs.interfaces.http_endpoint import HttpEndpointDataModel
 
-from relations import HttpOutputRequirer
+from relations import HttpEndpointManager
 
 
-class TestHttpOutputRequirer:
-    """Test HttpOutputRequirer class."""
+class TestHttpEndpointManager:
+    """Test HttpEndpointManager class."""
 
     @pytest.mark.parametrize(
         "scenario,setup",
         [
-            ("no_relations", lambda: ({"http-output": []}, None)),
+            ("no_relations", lambda: []),
         ],
     )
-    def test_get_http_output_info_returns_none(self, scenario, setup):
-        """Test get_http_output_info returns None for various scenarios.
+    def test_get_http_endpoint_returns_none(self, scenario, setup):
+        """Test get_http_endpoint returns None for various scenarios.
 
         Arrange: Set up mock charm according to scenario.
-        Act: Call get_http_output_info.
+        Act: Call get_http_endpoint.
         Assert: Verify None is returned.
         """
         mock_charm = MagicMock()
-        relations, _ = setup()
-        mock_charm.model.relations = relations
+        endpoints = setup()
 
-        requirer = HttpOutputRequirer(mock_charm, "http-output")
-        result = requirer.get_http_output_info()
+        with patch("relations.HttpEndpointRequirer") as mock_requirer_class:
+            mock_requirer = MagicMock()
+            mock_requirer.http_endpoints = endpoints
+            mock_requirer_class.return_value = mock_requirer
 
-        assert result is None
+            manager = HttpEndpointManager(mock_charm, "http-output")
+            result = manager.get_http_endpoint()
+
+            assert result is None
 
     @pytest.mark.parametrize(
-        "info,description",
+        "url,description",
         [
-            ({"url": "http://falcosidekick:2801"}, "basic HTTP URL"),
-            ({"url": "https://falcosidekick.example.com:2801/events"}, "HTTPS with path"),
+            ("http://falcosidekick:2801", "basic HTTP URL"),
+            ("https://falcosidekick.example.com:2801/events", "HTTPS with path"),
         ],
     )
-    def test_get_http_output_info_valid_infos(self, info, description):
-        """Test get_http_output_info returns valid URLs.
+    def test_get_http_endpoint_valid_infos(self, url, description):
+        """Test get_http_endpoint returns valid URLs.
 
         Arrange: Set up mock charm with relation containing valid URL.
-        Act: Call get_http_output_info.
-        Assert: Verify HttpOutputDataBag is returned with correct URL.
+        Act: Call get_http_endpoint.
+        Assert: Verify HttpEndpointDataModel is returned with correct URL.
         """
         mock_charm = MagicMock()
-        mock_relation = MagicMock()
-        mock_app = MagicMock()
-        mock_relation.app = mock_app
-        mock_relation.data = {mock_app: info}
-        mock_charm.model.relations = {"http-output": [mock_relation]}
+        mock_endpoint = HttpEndpointDataModel(url=url)
 
-        requirer = HttpOutputRequirer(mock_charm, "http-output")
-        result = requirer.get_http_output_info()
+        with patch("relations.HttpEndpointRequirer") as mock_requirer_class:
+            mock_requirer = MagicMock()
+            mock_requirer.http_endpoints = [mock_endpoint]
+            mock_requirer_class.return_value = mock_requirer
 
-        assert result is not None
-        assert result.url == info["url"]
+            manager = HttpEndpointManager(mock_charm, "http-output")
+            result = manager.get_http_endpoint()
+
+            assert result is not None
+            assert result.url == url
