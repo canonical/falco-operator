@@ -33,7 +33,7 @@ def mock_falco_layout(mock_falco_base_dir):
 
 
 @pytest.fixture
-def http_output_relation():
+def http_endpoint_relation():
     """Fixture for http-endpoint relation.
 
     Returns:
@@ -42,5 +42,5 @@ def http_output_relation():
     return testing.Relation(
         endpoint="http-endpoint",
         interface="http_endpoint",
-        remote_app_data={"url": "http://falcosidekick:2801"},
+        remote_app_data={"port": "8080", "scheme": "http", "hostname": "127.0.0.1"},
     )
