@@ -9,9 +9,9 @@ import logging
 import typing
 
 import ops
+from charmlibs.interfaces.http_endpoint import HttpEndpointRequirer
 
 from config import InvalidCharmConfigError
-from relations import HttpEndpointManager
 from service import (
     FalcoConfigFile,
     FalcoConfigurationError,
@@ -40,7 +40,7 @@ class Falco(CharmBaseWithState):
 
         self._state = None
 
-        self.http_endpoint_relation = HttpEndpointManager(
+        self.http_endpoint_requirer = HttpEndpointRequirer(
             self, relation_name=HTTP_ENDPOINT_RELATION_NAME
         )
 
@@ -60,11 +60,11 @@ class Falco(CharmBaseWithState):
         self.framework.observe(self.on.secret_changed, self.reconcile)
 
         self.framework.observe(
-            self.http_endpoint_relation._endpoint_requirer.on.http_endpoint_available,
+            self.http_endpoint_requirer.on.http_endpoint_available,
             self.reconcile,
         )
         self.framework.observe(
-            self.http_endpoint_relation._endpoint_requirer.on.http_endpoint_unavailable,
+            self.http_endpoint_requirer.on.http_endpoint_unavailable,
             self.reconcile,
         )
 
@@ -72,7 +72,7 @@ class Falco(CharmBaseWithState):
     def state(self) -> CharmState:
         """The charm state."""
         if self._state is None:
-            self._state = CharmState.from_charm(self, self.http_endpoint_relation)
+            self._state = CharmState.from_charm(self, self.http_endpoint_requirer)
         return self._state
 
     def _on_remove(self, _: ops.RemoveEvent) -> None:

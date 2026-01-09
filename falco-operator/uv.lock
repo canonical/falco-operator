@@ -82,7 +82,7 @@ wheels = [
 [[package]]
 name = "charmlibs-interfaces-http-endpoint"
 version = "1.0.0"
-source = { git = "https://github.com/chanchiwai-ray/charmlibs?subdirectory=interfaces%2Fhttp_endpoint&rev=a03bb6a21d526d19b1939e7b47a0d2ad3afbcf8f#a03bb6a21d526d19b1939e7b47a0d2ad3afbcf8f" }
+source = { git = "https://github.com/chanchiwai-ray/charmlibs?subdirectory=interfaces%2Fhttp_endpoint&rev=530c5df853d180c9813fbff3e4955d6178c47bd5#530c5df853d180c9813fbff3e4955d6178c47bd5" }
 dependencies = [
     { name = "ops" },
     { name = "pydantic" },
@@ -311,7 +311,7 @@ unit = [
 
 [package.metadata]
 requires-dist = [
-    { name = "charmlibs-interfaces-http-endpoint", git = "https://github.com/chanchiwai-ray/charmlibs?subdirectory=interfaces%2Fhttp_endpoint&rev=a03bb6a21d526d19b1939e7b47a0d2ad3afbcf8f" },
+    { name = "charmlibs-interfaces-http-endpoint", git = "https://github.com/chanchiwai-ray/charmlibs?subdirectory=interfaces%2Fhttp_endpoint&rev=530c5df853d180c9813fbff3e4955d6178c47bd5" },
     { name = "charmlibs-systemd", specifier = "~=1.0" },
     { name = "cosl", specifier = ">=1.4.0" },
     { name = "jinja2", specifier = ">=3.1.6" },

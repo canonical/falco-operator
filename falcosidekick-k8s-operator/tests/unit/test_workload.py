@@ -149,9 +149,7 @@ class TestFalcosidekick:
             mock_container.add_layer.assert_called_once()
             mock_container.replan.assert_called_once()
             mock_container.restart.assert_called_once_with("falcosidekick")
-            mock_http_output_provider.set_scheme_and_listen_port.assert_called_once_with(
-                "http", 2801
-            )
+            mock_http_output_provider.update_config.assert_called_once_with("http", 2801)
 
     @patch("workload.Falcosidekick.health", new_callable=MagicMock)
     def test_configure_without_changes(self, mock_health):
@@ -186,9 +184,7 @@ class TestFalcosidekick:
             mock_container.replan.assert_not_called()
             mock_container.restart.assert_not_called()
             # But http output info should still be set
-            mock_http_output_provider.set_scheme_and_listen_port.assert_called_once_with(
-                "http", 2801
-            )
+            mock_http_output_provider.update_config.assert_called_once_with("http", 2801)
 
     def test_configure_container_not_ready(self):
         """Test Falcosidekick configuration when container is not ready.
