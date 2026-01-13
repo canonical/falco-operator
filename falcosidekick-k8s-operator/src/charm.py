@@ -12,7 +12,7 @@ import ops
 from charmlibs.interfaces.http_endpoint import HttpEndpointProvider
 from charms.loki_k8s.v1.loki_push_api import LokiPushApiConsumer
 
-from certificates import TlsCertificateRequirer
+from certificates import CertificateTransferProvider, TlsCertificateRequirer
 from config import InvalidCharmConfigError
 from state import CharmBaseWithState, CharmState
 from workload import Falcosidekick, MissingLokiRelationError
@@ -20,6 +20,7 @@ from workload import Falcosidekick, MissingLokiRelationError
 logger = logging.getLogger(__name__)
 
 CERTIFICATE_RELATION_NAME = "certificates"
+CERTIFICATE_TRANSFER_RELATION_NAME = "send-ca-cert"
 SEND_LOKI_LOG_RELATION_NAME = "send-loki-logs"
 HTTP_ENDPOINT_RELATION_NAME = "http-endpoint"
 
@@ -53,6 +54,9 @@ class FalcosidekickCharm(CharmBaseWithState):
         )
         self.tls_certificate_requirer = TlsCertificateRequirer(
             self, relation_name=CERTIFICATE_RELATION_NAME
+        )
+        self.certificate_transfer_provider = CertificateTransferProvider(
+            self, relation_name=CERTIFICATE_TRANSFER_RELATION_NAME
         )
 
         self.framework.observe(self.on.install, self._install)
@@ -125,6 +129,7 @@ class FalcosidekickCharm(CharmBaseWithState):
                 self.state,
                 self.http_endpoint_provider,
                 self.tls_certificate_requirer,
+                self.certificate_transfer_provider,
             )
         except InvalidCharmConfigError as e:
             logger.error("%s", e)

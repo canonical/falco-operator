@@ -25,6 +25,11 @@ platforms:
 
 subordinate: true
 
+charm-libs:
+  - lib: certificate_transfer_interface.certificate_transfer
+    version: "1"
+
+
 parts:
   charm:
     source: .
@@ -101,3 +106,6 @@ requires:
   http-endpoint:
     limit: 1
     interface: http_endpoint
+  receive-ca-cert:
+    limit: 1
+    interface: certificate_transfer

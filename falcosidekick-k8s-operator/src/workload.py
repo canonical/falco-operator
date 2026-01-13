@@ -11,7 +11,7 @@ from charmlibs.interfaces.http_endpoint import HttpEndpointProvider
 from jinja2 import Environment, FileSystemLoader
 
 import state
-from certificates import TlsCertificateRequirer
+from certificates import CertificateTransferProvider, TlsCertificateRequirer
 
 logger = logging.getLogger(__name__)
 
@@ -182,6 +182,7 @@ class Falcosidekick:
         charm_state: state.CharmState,
         http_endpoint_provider: HttpEndpointProvider,
         tls_certificate_requirer: TlsCertificateRequirer,
+        certificate_transfer_provider: CertificateTransferProvider,
     ) -> None:
         """Configure the Falcosidekick workload idempotently.
 
@@ -192,6 +193,7 @@ class Falcosidekick:
             charm_state: The current charm state containing configuration parameters.
             http_endpoint_provider: The HttpEndpointManager instance to set http output data.
             tls_certificate_requirer: The TlsCertificateRequirer instance to manage TLS certificates.
+            certificate_transfer_provider: The CertificateTransferProvider instance to manage certificate transfers.
 
         Raises:
             MissingLokiRelationError: If the Loki relation is missing.
@@ -215,6 +217,9 @@ class Falcosidekick:
 
         # Configure tls certificate idempotently
         cert_changed = tls_certificate_requirer.configure(container=self.container)
+
+        # Configure certificate transfer idempotently
+        certificate_transfer_provider.configure(ca_cert=charm_state.ca_cert)
 
         changed = self.config_file.install(context={"charm_state": charm_state})
         if not changed and not cert_changed:

@@ -12,9 +12,14 @@ import ops
 from charmlibs.interfaces.http_endpoint import HttpEndpointRequirer
 from pydantic import AnyUrl, BaseModel, ValidationError
 
+from certificate import CertificateTransferRequirer
 from config import CharmConfig, InvalidCharmConfigError
 
 logger = logging.getLogger(__name__)
+
+
+class CaCertificateRequiredError(Exception):
+    """Exception raised when CA certificate is required but not provided."""
 
 
 class CharmState(BaseModel):
@@ -25,28 +30,35 @@ class CharmState(BaseModel):
         custom_config_repo_ref: Optional branch or tag to a custom configuration repository.
         custom_config_repo_ssh_key: Optional SSH key for custom configuration repository.
         http_output: Optional HTTP output data from http-output relation.
+        ca_certs: A dictionary mapping relation IDs to sets of CA certificates from certificate-transfer relations.
     """
 
     custom_config_repo: Optional[AnyUrl] = None
     custom_config_repo_ref: Optional[str] = None
     custom_config_repo_ssh_key: Optional[str] = None
     http_output: Optional[dict[str, str]] = None
+    ca_certs: dict[int, set[str]] = {}
 
     @classmethod
     def from_charm(
-        cls, charm: ops.CharmBase, http_endpoint_requirer: HttpEndpointRequirer
+        cls,
+        charm: ops.CharmBase,
+        http_endpoint_requirer: HttpEndpointRequirer,
+        cert_transfer_requirer: CertificateTransferRequirer,
     ) -> "CharmState":
         """Create a CharmState from a charm instance.
 
         Args:
             charm: The charm instance.
             http_endpoint_requirer: The HttpEndpointRequirer instance to get http output URL.
+            cert_transfer_requirer: The CertificateTransferRequirer instance to get ca certificate.
 
         Returns:
             A CharmState instance.
 
         Raises:
             InvalidCharmConfigError: If configuration validation fails.
+            CaCertificateRequiredError: If CA certificate is required but not provided.
         """
         try:
             charm_config = charm.load_config(CharmConfig)
@@ -75,11 +87,19 @@ class CharmState(BaseModel):
             http_output.update({"url": url})
             logger.info("Retrieved url info from relation: %s", url)
 
+        ca_certs = cert_transfer_requirer.get_transferred_ca_cert()
+
+        if "https" in http_output.get("url", "") and not cert_transfer_requirer.is_created():
+            err_msg = "CA certificate is required for HTTPS endpoint"
+            logger.error(err_msg)
+            raise CaCertificateRequiredError(err_msg)
+
         return cls(
             custom_config_repo=custom_config_repo,
             custom_config_repo_ref=custom_config_repo_ref,
             custom_config_repo_ssh_key=custom_config_repo_ssh_key,
             http_output=http_output,
+            ca_certs=ca_certs,
         )
 
 

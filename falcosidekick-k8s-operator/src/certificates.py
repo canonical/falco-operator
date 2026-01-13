@@ -16,6 +16,9 @@ from charmlibs.interfaces.tls_certificates import (
     PrivateKey,
     TLSCertificatesRequiresV4,
 )
+from charms.certificate_transfer_interface.v1.certificate_transfer import (
+    CertificateTransferProvides,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -96,6 +99,25 @@ class TlsCertificateRequirer:
             self._store_private_key(container, private_key=key)
 
         return cert_updated or key_updated
+
+    def get_ca_cert(self) -> str:
+        """Get the CA certificate.
+
+        Returns:
+            The CA certificate content as a string. If not available, returns an empty string.
+        """
+        if not self.is_ready():
+            logger.warning("Cannot get CA cert: tls_certificate relation not ready")
+            return ""
+
+        cert, _ = self._certificates.get_assigned_certificate(
+            certificate_request=self._get_certificate_request_attributes()
+        )
+        if not cert:
+            logger.warning("CA certificate not available")
+            return ""
+
+        return str(cert.ca)
 
     def _get_certificate_request_attributes(self) -> CertificateRequestAttributes:
         """Get the certificate request attributes.
@@ -234,3 +256,48 @@ class TlsCertificateRequirer:
             source=str(private_key),
         )
         logger.info("Pushed private key to workload")
+
+
+class CertificateTransferProvider:
+    """Certificate transfer provider for the charm.
+
+    This class manages the integration with a certificate transfer interface.
+    """
+
+    def __init__(self, charm: ops.CharmBase, relation_name: str) -> None:
+        """Initialize the certificate transfer provider.
+
+        Args:
+            charm: The charm instance that manages this relation.
+            relation_name: The name of the certificate transfer relation endpoint.
+        """
+        self._charm = charm
+        self._relation_name = relation_name
+        self._certificate_transfer = CertificateTransferProvides(
+            charm=self._charm,
+            relationship_name=self._relation_name,
+        )
+
+    def configure(self, ca_cert: Optional[str]) -> None:
+        """Configure the certificate transfer interface.
+
+        This method transfers or removes the ca_cert depending on its presence. It sends
+        the existing CA cert in the workload to relation data bag if ca_cert is present. Otherwise, the CA cert
+        is removed from the relation data bag.
+
+        Args:
+            ca_cert: The CA certificate to transfer, or None to remove it.
+        """
+        if not (relations := self._charm.model.relations.get(self._relation_name)):
+            logger.warning("Certificate transfer relation not created")
+            return
+
+        if not ca_cert:
+            for rel in relations:
+                self._certificate_transfer.remove_all_certificates(relation_id=rel.id)
+                logger.info("Removed CA cert from relation %s", rel.id)
+            return
+
+        for rel in relations:
+            self._certificate_transfer.add_certificates(certificates={ca_cert}, relation_id=rel.id)
+            logger.info("Sent CA certificate to relation %s", rel.id)

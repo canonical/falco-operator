@@ -15,6 +15,7 @@ from jinja2 import Environment, FileSystemLoader
 from ops.charm import CharmBase
 
 import state
+from certificate import CertificateTransferRequirer
 
 logger = logging.getLogger(__name__)
 
@@ -327,11 +328,17 @@ class FalcoService:
 
         logger.info("Falco service removed")
 
-    def configure(self, charm_state: state.CharmState) -> None:
+    def configure(
+        self,
+        charm_state: state.CharmState,
+        cert_transfer_requirer: CertificateTransferRequirer,
+    ) -> None:
         """Configure the Falco service.
 
         Args:
             charm_state (CharmState): The charm state
+            cert_transfer_requirer (CertificateTransferRequirer): The certificate transfer requirer
+
         Raises:
             FalcoConfigurationError: If configuration validation fails
         """
@@ -340,6 +347,7 @@ class FalcoService:
         try:
             self.custom_setting.configure(charm_state)
             self.service_file.update(context={"http_output": charm_state.http_output})
+            cert_transfer_requirer.configure(charm_state.ca_certs)
         except (GitCloneError, SshKeyScanError, RsyncError) as e:
             logger.error("Failed to configure Falco custom settings: %s", e)
             raise FalcoConfigurationError("Failed to configure Falco service") from e

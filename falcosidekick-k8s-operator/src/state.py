@@ -33,6 +33,7 @@ class CharmState(BaseModel):
         falcosidekick_tlsserver_key_file: The file path to the TLS server private key.
         falcosidekick_tlsserver_cert_file: The file path to the TLS server certificate.
         falcosidekick_tlsserver_notlsport: The port for non-TLS connections (for health check only).
+        ca_cert: The CA certificate content for TLS verification.
     """
 
     falcosidekick_listenport: int
@@ -41,6 +42,7 @@ class CharmState(BaseModel):
     falcosidekick_tlsserver_key_file: str
     falcosidekick_tlsserver_cert_file: str
     falcosidekick_tlsserver_notlsport: int
+    ca_cert: str
 
     @classmethod
     def from_charm(
@@ -91,6 +93,7 @@ class CharmState(BaseModel):
             falcosidekick_tlsserver_key_file=private_key_file,
             falcosidekick_tlsserver_cert_file=certificate_file,
             falcosidekick_tlsserver_notlsport=notlsport,
+            ca_cert=tls_certificate_requirer.get_ca_cert(),
         )
 
 
