@@ -13,8 +13,8 @@ listenaddress: "" # ip address to bind falcosidekick to (default: "" meaning all
 
 tlsserver:
   deploy: true
-  keyfile: "{{ falcosidekick_tlsserver_key_file }}"
-  certfile: "{{ falcosidekick_tlsserver_cert_file }}"
+  keyfile: "/etc/falcosidekick/certs/server/server.key"
+  certfile: "/etc/falcosidekick/certs/server/server.crt"
   notlsport: 2810
   notlspaths:
     - "/ping"

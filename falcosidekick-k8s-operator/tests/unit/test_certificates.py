@@ -141,8 +141,7 @@ class TestTlsCertificateRequirer:
 
         # Patch the methods that check if files are updated
         with (
-            patch.object(tls_requirer, "_is_certificate_updated", return_value=False),
-            patch.object(tls_requirer, "_is_private_key_updated", return_value=False),
+            patch.object(tls_requirer, "_is_cert_or_key_updated", return_value=False),
         ):
             # Act
             result = tls_requirer.configure(mock_container)

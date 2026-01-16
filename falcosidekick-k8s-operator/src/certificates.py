@@ -20,9 +20,9 @@ from charmlibs.interfaces.tls_certificates import (
 
 logger = logging.getLogger(__name__)
 
-
-PRIVATE_KEY = Path("/etc/falcosidekick/certs/server/server.key")
-CERTIFICATE = Path("/etc/falcosidekick/certs/server/server.crt")
+# See ./templatesfalcosidekick.yaml.j2
+KEY = Path("/etc/falcosidekick/certs/server/server.key")
+CERT = Path("/etc/falcosidekick/certs/server/server.crt")
 
 
 class TlsCertificateRequirer:
@@ -73,15 +73,12 @@ class TlsCertificateRequirer:
             logger.warning("Cannot configure TLS: tls_certificate relation not ready")
             return False
 
-        if cert_updated := self._is_certificate_updated(container, cert.certificate):
-            self._store_file_to_container(
-                container, path=CERTIFICATE, source=str(cert.certificate)
-            )
+        if cert_or_key_updated := self._is_cert_or_key_updated(container, cert.certificate, key):
+            logger.info("Updating TLS certificate and private key in workload")
+            self._store_file_to_container(container, path=KEY, source=str(key))
+            self._store_file_to_container(container, path=CERT, source=str(cert.certificate))
 
-        if key_updated := self._is_private_key_updated(container, key):
-            self._store_file_to_container(container, path=PRIVATE_KEY, source=str(key))
-
-        return cert_updated or key_updated
+        return cert_or_key_updated
 
     def _get_assigned_cert_and_key(
         self,
@@ -131,39 +128,30 @@ class TlsCertificateRequirer:
             sans_dns=sorted(sans_dns),
         )
 
-    def _is_certificate_updated(
-        self, container: ops.Container, certificate: Optional[Certificate]
+    def _is_cert_or_key_updated(
+        self,
+        container: ops.Container,
+        certificate: Optional[Certificate],
+        private_key: Optional[PrivateKey],
     ) -> bool:
-        """Check if the certificate needs to be updated.
+        """Check if the certificate or private key need to be updated.
 
         Args:
             container: The container where certificates are stored.
             certificate: The new certificate to compare with the existing one.
-
-        Returns:
-            True if the certificate differs from the stored one, False otherwise.
-        """
-        existing_cert = self._get_file_from_container(container, path=CERTIFICATE)
-        if existing_cert is None:
-            return True
-        return Certificate.from_string(existing_cert) != certificate
-
-    def _is_private_key_updated(
-        self, container: ops.Container, private_key: Optional[PrivateKey]
-    ) -> bool:
-        """Check if the private key needs to be updated.
-
-        Args:
-            container: The container where private keys are stored.
             private_key: The new private key to compare with the existing one.
 
         Returns:
-            True if the private key differs from the stored one, False otherwise.
+            True if the certificate or private key differ from the stored one, False otherwise.
         """
-        existing_key = self._get_file_from_container(container, path=PRIVATE_KEY)
-        if existing_key is None:
+        existing_key = self._get_file_from_container(container, path=KEY)
+        existing_cert = self._get_file_from_container(container, path=CERT)
+        if not existing_key or not existing_cert:
             return True
-        return PrivateKey.from_string(existing_key) != private_key
+
+        key_changed = PrivateKey.from_string(existing_key) != private_key
+        cert_changed = Certificate.from_string(existing_cert) != certificate
+        return key_changed or cert_changed
 
     def _store_file_to_container(self, container: ops.Container, path: Path, source: str) -> None:
         """Store the content to a file in the workload container.

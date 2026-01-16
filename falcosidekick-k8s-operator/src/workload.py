@@ -11,7 +11,7 @@ from charmlibs.interfaces.http_endpoint import HttpEndpointProvider
 from jinja2 import Environment, FileSystemLoader
 
 import state
-from certificates import CERTIFICATE, PRIVATE_KEY, TlsCertificateRequirer
+from certificates import TlsCertificateRequirer
 
 logger = logging.getLogger(__name__)
 
@@ -225,13 +225,8 @@ class Falcosidekick:
         # Configure tls certificate idempotently
         cert_changed = tls_certificate_requirer.configure(container=self.container)
 
-        changed = self.config_file.install(
-            context={
-                "charm_state": charm_state,
-                "falcosidekick_tlsserver_key_file": str(PRIVATE_KEY),
-                "falcosidekick_tlsserver_cert_file": str(CERTIFICATE),
-            }
-        )
+        # Install configuration file
+        changed = self.config_file.install(context={"charm_state": charm_state})
         if not changed and not cert_changed:
             logger.warning("Configuration or certificate not changed; skipping reconfiguration")
             return
