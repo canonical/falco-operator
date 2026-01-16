@@ -6,11 +6,11 @@
 """Integration tests."""
 
 import logging
-import time
 
 import jubilant
 import pytest
 import requests
+from tenacity import retry, stop_after_delay, wait_fixed
 
 logger = logging.getLogger(__name__)
 
@@ -192,18 +192,28 @@ def test_send_dummy_logs(juju: jubilant.Juju):
         timeout=10,
     )
 
-    # It might take few seconds for loki to receive the result
-    time.sleep(5)
+    # Query loki with retry as it might take time for logs to propagate
+    @retry(stop=stop_after_delay(30), wait=wait_fixed(2), reraise=True)
+    def query_loki_for_logs():
+        """Query loki for logs with retry logic.
 
-    # Query from default loki endpoint
-    resp = requests.get(
-        f"http://{loki_address}:3100/loki/api/v1/query_range",
-        params={"query": '{rule="Write below binary dir"} |= ``'},
-        timeout=10,
-    )
-    assert resp.ok, f"Loki query failed: {resp.status_code} {resp.text}"
-    result = resp.json()
-    assert len(result["data"]["result"]) > 0
+        Returns:
+            The JSON response from loki.
+
+        Raises:
+            AssertionError: If the query fails or no results are found.
+        """
+        resp = requests.get(
+            f"http://{loki_address}:3100/loki/api/v1/query_range",
+            params={"query": '{rule="Write below binary dir"} |= ``'},
+            timeout=10,
+        )
+        assert resp.ok, f"Loki query failed: {resp.status_code} {resp.text}"
+        result = resp.json()
+        assert len(result["data"]["result"]) > 0, "No logs found in Loki"
+        return result
+
+    result = query_loki_for_logs()
     assert result["data"]["result"][0]["stream"].get("rule", "") == "Write below binary dir"
 
 
@@ -258,7 +268,7 @@ def test_tls_certificates_relation(juju: jubilant.Juju):
     )
 
     # /ping should be serving at 2810 when TLS is enforced
-    assert resp.ok, "/ping is not reachable via http on port 2810 when TLS is enforced"
+    assert resp.ok, "/ping should be reachable via http on port 2810 when TLS is enforced"
 
     juju.remove_relation(
         f"{FALCOSIDEKICK_K8S}:certificates", f"{SELF_SIGNED_CERTIFICATE}:certificates"
