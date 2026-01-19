@@ -5,7 +5,7 @@
 
 import logging
 from pathlib import Path
-from socket import getfqdn
+from socket import gethostname
 from typing import Optional
 
 import ops
@@ -123,7 +123,7 @@ class TlsCertificateRequirer:
         )
 
         return CertificateRequestAttributes(
-            common_name=getfqdn(),
+            common_name=gethostname(),
             sans_ip=sorted(sans_ip),
             sans_dns=sorted(sans_dns),
         )
