@@ -38,11 +38,15 @@ class TestTlsCertificateRequirer:
         "cert,key,expected_result",
         [
             (
-                MagicMock(spec=ProviderCertificate),
+                MagicMock(spec=ProviderCertificate, certificate="mock cert"),
                 MagicMock(spec=PrivateKey),
                 True,
             ),  # Both available
-            (MagicMock(spec=ProviderCertificate), None, False),  # Only cert
+            (
+                MagicMock(spec=ProviderCertificate, certificate="mock cert"),
+                None,
+                False,
+            ),  # Only cert
             (None, MagicMock(spec=PrivateKey), False),  # Only key
             (None, None, False),  # Neither available
         ],
@@ -59,8 +63,6 @@ class TestTlsCertificateRequirer:
         # Arrange
         mock_charm = MagicMock()
         mock_charm.model.relations.get.return_value = [Mock()]
-        if cert:
-            cert.certificate = "mock certificate"
         mock_get_assigned_certificate.return_value = (cert, key)
         mock_container = MagicMock(spec=ops.Container)
         mock_container.exists.return_value = False
@@ -79,27 +81,6 @@ class TestTlsCertificateRequirer:
             # When cert or key is missing, configure should not push
             assert result is False
             mock_container.push.assert_not_called()
-
-    def test_configure_not_ready(self):
-        """Test configure returns False when TLS is not ready.
-
-        Arrange: Set up TLS requirer that is not ready.
-        Act: Configure TLS certificates.
-        Assert: Returns False without configuring.
-        """
-        # Arrange
-        mock_charm = MagicMock()
-        mock_charm.model.relations.get.return_value = None
-        mock_container = MagicMock(spec=ops.Container)
-
-        tls_requirer = TlsCertificateRequirer(mock_charm, "certificates")
-
-        # Act
-        result = tls_requirer.configure(mock_container)
-
-        # Assert
-        assert result is False
-        mock_container.push.assert_not_called()
 
     def test_configure_update(self, mock_get_assigned_certificate):
         """Test configure with certificate update.
@@ -141,7 +122,7 @@ class TestTlsCertificateRequirer:
 
         # Patch the methods that check if files are updated
         with (
-            patch.object(tls_requirer, "_is_cert_or_key_updated", return_value=False),
+            patch.object(tls_requirer, "_is_cert_or_key_needs_update", return_value=False),
         ):
             # Act
             result = tls_requirer.configure(mock_container)

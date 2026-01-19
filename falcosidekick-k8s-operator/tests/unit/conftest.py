@@ -22,8 +22,7 @@ def mock_get_assigned_certificate():
         A patch context manager for get_assigned_certificate with default valid cert/key.
     """
     with patch("certificates.TLSCertificatesRequiresV4.get_assigned_certificate") as mock:
-        mock_cert = MagicMock(spec=ProviderCertificate)
-        mock_cert.certificate = "mock certificate"
+        mock_cert = MagicMock(spec=ProviderCertificate, certificate="mock cert")
         mock_key = MagicMock(spec=PrivateKey)
         mock.return_value = (mock_cert, mock_key)
         yield mock

@@ -66,19 +66,19 @@ class TlsCertificateRequirer:
             container: The container where the certificates will be configured.
 
         Returns:
-            True if the certificate and key were configured, False otherwise.
+            True if new certificate and key exists and were configured, False otherwise.
         """
         cert, key = self._get_assigned_cert_and_key()
         if not cert or not key:
             logger.warning("Cannot configure TLS: tls_certificate relation not ready")
             return False
 
-        if cert_or_key_updated := self._is_cert_or_key_updated(container, cert.certificate, key):
+        if update_required := self._is_cert_or_key_needs_update(container, cert.certificate, key):
             logger.info("Updating TLS certificate and private key in workload")
             self._store_file_to_container(container, path=KEY, source=str(key))
             self._store_file_to_container(container, path=CERT, source=str(cert.certificate))
 
-        return cert_or_key_updated
+        return update_required
 
     def _get_assigned_cert_and_key(
         self,
@@ -128,7 +128,7 @@ class TlsCertificateRequirer:
             sans_dns=sorted(sans_dns),
         )
 
-    def _is_cert_or_key_updated(
+    def _is_cert_or_key_needs_update(
         self,
         container: ops.Container,
         certificate: Optional[Certificate],
@@ -136,13 +136,18 @@ class TlsCertificateRequirer:
     ) -> bool:
         """Check if the certificate or private key need to be updated.
 
+        This method get the existing certificate and private key stored in the container, and
+        compared with the currently assigned certificate and private key. If the existing
+        certificate or private key does not exist, this method assumes they need to be updated, and
+        returns True.
+
         Args:
             container: The container where certificates are stored.
             certificate: The new certificate to compare with the existing one.
             private_key: The new private key to compare with the existing one.
 
         Returns:
-            True if the certificate or private key differ from the stored one, False otherwise.
+            True if the certificate or private key need to be updated, False otherwise.
         """
         existing_key = self._get_file_from_container(container, path=KEY)
         existing_cert = self._get_file_from_container(container, path=CERT)
