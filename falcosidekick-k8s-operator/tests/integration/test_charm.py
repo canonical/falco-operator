@@ -9,7 +9,6 @@ import logging
 
 import jubilant
 import pytest
-import requests
 
 logger = logging.getLogger(__name__)
 
