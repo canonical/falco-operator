@@ -8,6 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 Each revision is versioned by the date of the revision.
 
+## 2026-01-20
+
+### Changed
+
+Add integration tests for Juju 4.
+
 ## 2026-01-10
 
 Add integration between falco-operator and falcosidekick-k8s-operator via http_endpoint interface.
