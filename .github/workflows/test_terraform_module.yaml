@@ -24,7 +24,7 @@ jobs:
       matrix:
         working_dir: [falco-operator, falcosidekick-k8s-operator]
     steps:
-    - uses: actions/checkout@v6.0.1
+    - uses: actions/checkout@v6.0.2
     - uses: charmed-kubernetes/actions-operator@main
       with:
         provider: "microk8s"
